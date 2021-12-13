@@ -5,6 +5,10 @@ import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryResult;
+import org.eclipse.rdf4j.rio.RDFFormat;
+
+import java.io.File;
+import java.io.IOException;
 
 public class programme {
     public static void main(String[] args) {
@@ -106,6 +110,29 @@ public class programme {
         }
      agRepositoryConnection.clear();
         System.out.println("after deleting instances the graph size is :"+agRepositoryConnection.size());
+
+        // Asserting through a file
+        String baseURI = "http://example.org/example/local";
+        AGRepository testRepo1 = agServer.getRootCatalog().createRepository("testRepo1");
+        AGRepositoryConnection testRepo1Connection= testRepo1.getConnection();
+        testRepo1Connection.clear();
+
+        try {
+            testRepo1Connection.add(new File("C:/Users/a835928/IdeaProjects/Alegro1/src/main/resources/human1.rdf"),baseURI, RDFFormat.RDFXML);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String test1RepoQueryString = "select ?s ?o ?p where {?s ?o ?p}";
+        AGTupleQuery test1RepoQuery= testRepo1Connection.prepareTupleQuery(AGQueryLanguage.SPARQL,test1RepoQueryString);
+        TupleQueryResult testRepo1Result = test1RepoQuery.evaluate();
+        while(testRepo1Result.hasNext()){
+         BindingSet testRepo1Set =  testRepo1Result.next();
+         testRepo1Set.getValue("s");
+            Value s = testRepo1Set.getValue("s");
+            Value p = testRepo1Set.getValue("p");
+            Value o = testRepo1Set.getValue("o");
+            System.out.println("RDF FILE : Subject: " + s + ", Predicate: " + p + ", Object: " + o);
+        }
 
 
     }
